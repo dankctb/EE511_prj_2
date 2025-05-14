@@ -22,6 +22,11 @@ In this project, you will design a 5-stage pipelined processor compatible with C
    - `ALU_TEST.f`
    - `ALU_TEST_inst.hex`
 
+To run ALU test, 
+iverilog -c .\ALU_TEST.f -o .\ALU_TEST
+vvp .\ALU_TEST
+generate ALU_TEST_data.hex for each op_test ?????????
+
 ## Project Requirements
 
 ### 1. Code Organization
