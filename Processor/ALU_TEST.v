@@ -97,13 +97,22 @@ module TB ();
 	// for ALU_TEST (can be ignored)
 	// --------------------------------------------
 		if (ALU_CLK == 16'd9500) begin
-			$readmemh("ALU_test_data.hex", ALU_TEST_MEM);
+			$display("Reading ALU_TEST_data.hex at clock=%d", ALU_CLK);
+			$readmemh("ALU_TEST_data.hex", ALU_TEST_MEM); // This is from the variable ram in MemModel.v
+			// Print some of the loaded values to verify
+			$display("Memory[132]=%h", ALU_TEST_MEM[132]);
+			$display("Memory[133]=%h", ALU_TEST_MEM[133]);
+			$display("Memory[134]=%h", ALU_TEST_MEM[134]);
 		end
 		if (ALU_CLK == 16'd9550) begin
+			// Print both expected and actual values
+			$display("ADD_REG_test: got=%h, expected=%h", ALU_TEST_MEM[132], 32'h0000_0001);
+			
 			if (ALU_TEST_MEM[132] == 32'h0000_0001)
 				$display("ADD_REG_test passed");
 			else
 				$display("ADD_REG_test failed");
+			$display("ADD_IMM_test: got=%h, expected=%h", ALU_TEST_MEM[133], 32'h0000_0001);
 
 			if (ALU_TEST_MEM[133] == 32'h0000_0001)
 				$display("ADD_IMM_test passed");
@@ -170,6 +179,23 @@ module TB ();
 			else
 				$display("NOT_test failed");
 		end
+
+		// // Add a continuous monitoring to see memory changes during execution
+		// always @(posedge CLK) begin
+		// 	if (ALU_CLK > 9000 && ALU_CLK < 9600) begin
+		// 		// Print relevant memory values periodically
+		// 		if (ALU_CLK % 100 == 0) begin
+		// 			$display("Clock=%d, mem[132]=%h, mem[133]=%h", 
+		// 					ALU_CLK, ALU_TEST_MEM[132], ALU_TEST_MEM[133]);
+		// 		end
+		// 	end
+		// end
+
+		// // Add debug to watch for memory write activity
+		// if (DREQ && DWE) begin
+		// 	$display("Memory write at clock=%d: addr=%h, data=%h, size=%b", 
+		// 			 ALU_CLK, DADDR, DOUT, DSIZE);
+		// end
 	// --------------------------------------------
 	end
 

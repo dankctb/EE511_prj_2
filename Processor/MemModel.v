@@ -5,15 +5,15 @@ module SRAM (
 	input wire	[11:0]	ADDR1,
 	input wire			WE1, 
 	input wire	[3:0]	BE1,
-	input wire	[31:0]	DI1, 
-	output wire [31:0]	DO1,
+	input wire	[31:0]	DI1, // data input for port 1 of the SRAM
+	output wire [31:0]	DO1, // data output for port 1 of the SRAM
 
 	input wire			CSN2,
 	input wire	[11:0]	ADDR2,
 	input wire			WE2, 
 	input wire	[3:0]	BE2,
-	input wire	[31:0]	DI2, 
-	output wire [31:0]	DO2
+	input wire	[31:0]	DI2, // data input for port 2 of the SRAM
+	output wire [31:0]	DO2 // data output for port 2 of the SRAM
 );
 	
 	// ROMDATA = initial memory data
@@ -38,7 +38,8 @@ module SRAM (
 	assign DO2 = outline2;
 
 	always @ (posedge CLK) begin
-	// writememh can be ignored
+	// writememh can be ignored 
+	// keep writing to the ALU_TEST_data.hex file from ram
     $writememh(MEMDATA, ram);
 
 		if (~CSN1) begin		// chip select at negative
@@ -55,7 +56,7 @@ module SRAM (
 				if (BE1[2]) tmp_wd1[23:16] = DI1[23:16];
 				if (BE1[3]) tmp_wd1[31:24] = DI1[31:24];
 
-				ram[ADDR1] = tmp_wd1;
+				ram[ADDR1] = tmp_wd1; // write to the ram from tmp_wd <= DI1 
 			end
 		end
 

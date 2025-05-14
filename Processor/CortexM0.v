@@ -319,10 +319,10 @@ REGFILE REGFILE (
   .nRST(RESET_N),
   .WEN1(wb_rf_wr_a_en),
   .WA1(wb_rf_wr_a_addr), 
-  .DI1(wb_wr_data), 
+  .DI1(wb_wr_data), // WriteBackStage module, will be loaded to ram
   .WEN2(wb_rf_wr_b_en),
   .WA2(wb_rf_wr_b_addr),
-  .DI2(wb_pc_addr),
+  .DI2(wb_pc_addr), // WriteBackStage module, will be loaded to ram
   .RA0(id_rf_rd_a_addr),
   .RA1(id_rf_rd_b_addr),
   .RA2(id_rf_rd_c_addr),
@@ -337,9 +337,6 @@ REGFILE REGFILE (
 
 
 //################### CONTROLS ###################
-
-
-
 
 ForwardUnit fwd(
   .exe_mem_rd_i(exe_rf_wr_a_addr),
