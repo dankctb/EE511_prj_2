@@ -107,75 +107,87 @@ module TB ();
 		if (ALU_CLK == 16'd9550) begin
 			// Print both expected and actual values
 			$display("ADD_REG_test: got=%h, expected=%h", ALU_TEST_MEM[132], 32'h0000_0001);
-			
 			if (ALU_TEST_MEM[132] == 32'h0000_0001)
 				$display("ADD_REG_test passed");
 			else
 				$display("ADD_REG_test failed");
+			
 			$display("ADD_IMM_test: got=%h, expected=%h", ALU_TEST_MEM[133], 32'h0000_0001);
-
 			if (ALU_TEST_MEM[133] == 32'h0000_0001)
 				$display("ADD_IMM_test passed");
 			else
 				$display("ADD_IMM_test failed");
 
+			$display("SUB_REG_test: got=%h, expected=%h", ALU_TEST_MEM[134], 32'hfffffffd);
 			if (ALU_TEST_MEM[134] == 32'hfffffffd)
 				$display("SUB_REG_test passed");
 			else
 				$display("SUB_REG_test failed");
 
+			$display("SUB_IMM_test: got=%h, expected=%h", ALU_TEST_MEM[135], 32'hfffffffd);
 			if (ALU_TEST_MEM[135] == 32'hfffffffd)
 				$display("SUB_IMM_test passed");
 			else
 				$display("SUB_IMM_test failed");
 
+			$display("MUL_test: got=%h, expected=%h", ALU_TEST_MEM[136], 32'hfffffffe);
 			if (ALU_TEST_MEM[136] == 32'hfffffffe)
 				$display("MUL_test passed");
 			else
 				$display("MUL_test failed");
 
+			$display("LSL_IMM_test: got=%h, expected=%h", ALU_TEST_MEM[137], 32'hfffffffe);
 			if (ALU_TEST_MEM[137] == 32'hffffffff)
 				$display("LSL_IMM_test passed");
 			else
 				$display("LSL_IMM_test failed");
 
+			$display("LSL_REG_test: got=%h, expected=%h", ALU_TEST_MEM[138], 32'hffffffff);
 			if (ALU_TEST_MEM[138] == 32'hffffffff)
 				$display("LSL_REG_test passed");
 			else
 				$display("LSL_REG_test failed");
 
+
+			$display("LSR_REG_test: got=%h, expected=%h", ALU_TEST_MEM[139], 32'hfffffffc);
 			if (ALU_TEST_MEM[139] == 32'hfffffffc)
 				$display("LSR_REG_test passed");
 			else
 				$display("LSR_REG_test failed");
 
+			$display("LSR_IMM_test: got=%h, expected=%h", ALU_TEST_MEM[140], 32'hfffffffc);
 			if (ALU_TEST_MEM[140] == 32'hfffffffc)
 				$display("LSR_IMM_test passed");
 			else
 				$display("LSR_IMM_test failed");
 
+			$display("AND_test: got=%h, expected=%h", ALU_TEST_MEM[141], 32'h00000002);
 			if (ALU_TEST_MEM[141] == 32'h00000002)
 				$display("AND_test passed");
 			else
 				$display("AND_test failed");
 
+			$display("XOR_test: got=%h, expected=%h", ALU_TEST_MEM[142], 32'hfffffffd);
 			if (ALU_TEST_MEM[142] == 32'hfffffffd)
 				$display("XOR_test passed");
 			else
 				$display("XOR_test failed");
 
+			$display("OR_test: got=%h, expected=%h", ALU_TEST_MEM[143], 32'hffffffff);
 			if (ALU_TEST_MEM[143] == 32'hffffffff)
 				$display("OR_test passed");
 			else
 				$display("OR_test failed");
 
+			$display("NOT_test: got=%h, expected=%h", ALU_TEST_MEM[144], 32'hfffffffd);
 			if (ALU_TEST_MEM[144] == 32'hfffffffd)
 				$display("NOT_test passed");
 			else
 				$display("NOT_test failed");
 
+			$display("MOVA_test: got=%h, expected=%h", ALU_TEST_MEM[145], 32'h0000_0001);
 			if (ALU_TEST_MEM[145] == 32'h0000_0001)
-				$display("NOT_test passed");
+				$display("MOVA_test passed");
 			else
 				$display("NOT_test failed");
 		end

@@ -257,7 +257,7 @@ wire              exe_rf_wr_a_en;
 wire [3:0]        exe_rf_wr_a_addr;
 wire              exe_rf_wr_b_en;
 wire [3:0]        exe_rf_wr_b_addr;
-wire [31:0]       exe_alu_result;
+wire [31:0]       exe_alu_result; // output of the ALU
 wire [3:0]        exe_br_type;
 wire [1:0]        exe_br_en;
 wire [31:0]       exe_reg_c_data;
@@ -475,10 +475,10 @@ ExecuteStage EXE(
   .rf_wr_a_addr_o(exe_rf_wr_a_addr),
   .rf_wr_b_en_o(exe_rf_wr_b_en),
   .rf_wr_b_addr_o(exe_rf_wr_b_addr),
-  .alu_result_o(exe_alu_result),
+  .alu_result_o(exe_alu_result), // output of the ALU
   .br_en_o(exe_br_en),
   .br_type_o(exe_br_type),
-  .reg_c_data_o(exe_reg_c_data),
+  .reg_c_data_o(exe_reg_c_data), // output of the register file
   .wb_sel_o(exe_wb_sel),
   .pc_addr_o(exe_pc_addr),
   .mem_write_o(exe_mem_write),
@@ -492,10 +492,6 @@ ExecuteStage EXE(
   .V_o(exe_V) 
 
 );
-
-
-
-
 
 MemoryStage MEM(
   .clk_i(clk_i),
@@ -578,7 +574,7 @@ WriteBackStage WB(
 
 endmodule
 
-// your code here (for other modules)
+// your code here, for other modules
 
 
 //Instruction fetch pipeline stage
@@ -2627,6 +2623,10 @@ always @(*) begin
         overflow_o = a_i[31] ^ b_i[31] ^ result_o[31] ^ carry_o;
         negative_o = result_o[31];
         zero_o = ~|result_o;    
+      // Debug
+      $display("  ADD: result=%h, carry=%b, ovf=%b, neg=%b, zero=%b", 
+               result_o, carry_o, overflow_o, negative_o, zero_o);
+    
       end
 
       `ALU_SUB : begin
@@ -2634,6 +2634,8 @@ always @(*) begin
         overflow_o = a_i[31] ^ b_i[31] ^ result_o[31] ^ carry_o;
         negative_o = result_o[31];
         zero_o = ~|result_o;            
+      // Debug
+      $display("  SUB: a=%h, b=%h, ~b=%h, result=%h, c=%b", a_i, b_i, ~b_i, result_o, carry_o);
       end
 
       `ALU_MOVA : begin
