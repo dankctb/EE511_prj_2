@@ -1,4 +1,4 @@
-CortexM0_test.v
+CortexM0_check.v
 MemModel.v
 RegisterFileModel.v
 ALU_test.v
