@@ -469,16 +469,16 @@ ExecuteStage EXE(
   .V_i(id_V),
   .fwd_mux_a_i(fwd_mux_a),
   .fwd_mux_b_i(fwd_mux_b),
-  .fwd_exe_mem_data_i(exe_alu_result),
+  .fwd_exe_mem_data_i(exe_alu_result), // connect to output of the ALU
   .fwd_mem_wb_data_i(mem_alu_result),
   .rf_wr_a_en_o(exe_rf_wr_a_en),
   .rf_wr_a_addr_o(exe_rf_wr_a_addr),
   .rf_wr_b_en_o(exe_rf_wr_b_en),
   .rf_wr_b_addr_o(exe_rf_wr_b_addr),
-  .alu_result_o(exe_alu_result), // output of the ALU
+  .alu_result_o(exe_alu_result), // connect to output of the ALU
   .br_en_o(exe_br_en),
   .br_type_o(exe_br_type),
-  .reg_c_data_o(exe_reg_c_data), // output of the register file
+  .reg_c_data_o(exe_reg_c_data), // connect from output of the register file to ???? memory stage ????
   .wb_sel_o(exe_wb_sel),
   .pc_addr_o(exe_pc_addr),
   .mem_write_o(exe_mem_write),
@@ -974,7 +974,7 @@ module ExecuteStage(
   .overflow_i(V_i),
   .negative_i(N_i),
   .zero_i(Z_i),
-  .result_o(alu_result_w),
+  .result_o(alu_result_w), //output value of ALU, 32 bit
   .carry_o(C_w),
   .overflow_o(V_w),
   .negative_o(N_w),
@@ -991,7 +991,7 @@ always @(posedge clk_i or negedge reset_i /*or posedge flush_i*/) begin
     alu_result_o <= 32'b0;
     br_type_o <= 4'b0;
     br_en_o <= 2'b0;
-    reg_c_data_o <= 32'b0;
+    reg_c_data_o  <= 32'b0;
     wb_sel_o <= 1'b0;
     mem_write_o <= 1'b0;
     mem_cs_o <= `MEM_CSN_INACTIVE;
@@ -1046,7 +1046,7 @@ module MemoryStage(
   input [31:0]      alu_result_i,
   input [3:0]       br_type_i,
   input [1:0]       br_en_i,
-  input [31:0]      reg_c_data_i,
+  input [31:0]      reg_c_data_i, //output value from register file
   input             wb_sel_i,
   input             mem_write_i,
   input             mem_cs_i,
@@ -1090,7 +1090,7 @@ module MemoryStage(
   wire [3:0]  rf_wr_a_addr_w;
   wire        rf_wr_b_en_w;
   wire [3:0]  rf_wr_b_addr_w;
-  wire [31:0] alu_result_w;
+  wire [31:0] alu_result_w; //output value from ALU, 32 bit
   wire        wb_sel_w;
   wire        apsr_wr_en_w;
   wire        Z_w;
@@ -2453,7 +2453,7 @@ module MultipleAccessUnit(
   end
 endmodule
 
-//ALU module 
+//ALU module ============================
 module ArithmeticLogicUnit(
   
   input   [4:0]   alu_op_i,
@@ -2467,7 +2467,7 @@ module ArithmeticLogicUnit(
   input           zero_i,
 
   //Result and flags out
-  output reg [31:0]  result_o,
+  output reg [31:0]  result_o, //output value of ALU, 32 bit
   output reg         carry_o,
   output reg         overflow_o,
   output reg         negative_o,
