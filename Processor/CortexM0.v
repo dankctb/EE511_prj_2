@@ -162,7 +162,7 @@
 `define BR_DIS  1'b0
 `define BR_EN  1'b1
 
-`define PC_RESET_VECTOR 32'h000000D0
+`define PC_RESET_VECTOR 32'h00000000 //dankfix
 `define PC_SEL_NEXT 2'b00
 `define PC_SEL_BRANCH 2'b01
 `define PC_SEL_REG  2'b10
@@ -200,12 +200,12 @@ module CortexM0 (
 	input	wire  [31:0]	INSTR,
 
 	// For data memory
-	output wire	    		DREQ,
-	output wire	[31:0]	DADDR,
-	output wire	  			DRW,
-	output wire	[ 1:0]	DSIZE,
-	input	wire	[31:0]	DIN,
-	output wire	[31:0]	DOUT
+	output wire	    		DREQ, // request to read/write
+	output wire	[31:0]	DADDR, // address to read/write
+	output wire	  			DRW, // read/write
+	output wire	[ 1:0]	DSIZE, // size of the data to read/write
+	input	wire	[31:0]	DIN, // data to read/write
+	output wire	[31:0]	DOUT // data to read/write
 );
 
 wire [31:0]       addr_branch;
@@ -398,15 +398,15 @@ InstructionDecodeStage ID(
   .N_new_i(wb_N),
   .C_new_i(wb_C),
   .V_new_i(wb_V),
-  .reg_a_data_i(rf_reg_a_data),
-  .reg_b_data_i(rf_reg_b_data),
-  .reg_c_data_i(rf_reg_c_data),
+  .reg_a_data_i(rf_reg_a_data), 
+  .reg_b_data_i(rf_reg_b_data), 
+  .reg_c_data_i(rf_reg_c_data), // input from register file
   .rf_rd_a_addr_o(id_rf_rd_a_addr),
   .rf_rd_b_addr_o(id_rf_rd_b_addr),
-  .rf_rd_c_addr_o(id_rf_rd_c_addr),
+  .rf_rd_c_addr_o(id_rf_rd_c_addr), // output to register file
   .rf_wr_a_en_o(id_rf_wr_a_en),
   .rf_wr_a_addr_o(id_rf_wr_a_addr),
-  .rf_wr_b_en_o(id_rf_wr_b_en),
+  .rf_wr_b_en_o(id_rf_wr_b_en), 
   .rf_wr_b_addr_o(id_rf_wr_b_addr),
   .imm_o(id_imm),
   .instr_o(exe_instr),
@@ -448,9 +448,9 @@ ExecuteStage EXE(
   .imm_i(id_imm),
   .instr_i(exe_instr),
   .instr_o(mem_instr),
-  .reg_a_data_i(rf_reg_a_data),
-  .reg_b_data_i(rf_reg_b_data),
-  .reg_c_data_i(rf_reg_c_data),
+  .reg_a_data_i(rf_reg_a_data), // input from register file
+  .reg_b_data_i(rf_reg_b_data), // input from register file
+  .reg_c_data_i(rf_reg_c_data), // input from register file
   .br_en_i(id_br_en),
   .br_type_i(id_br_type),
   .pc_addr_i(if_pc_addr),
@@ -1185,7 +1185,18 @@ always @(posedge clk_i or negedge reset_i) begin
     V_o <= V_w;
   end
 end
-
+//============Memory access debug
+always @(posedge clk_i) begin
+  if (mem_cs_o == 1'b1) begin
+    $display("Memory access at time %0t: addr=0x%h, write=%b, data=%h", 
+             $time, mem_addr_o, mem_write_o, (mem_write_o ? mem_wdata_o : mem_rdata_o));
+    
+    if (mem_addr_o[13:2] >= 132 && mem_addr_o[13:2] <= 145) begin
+      $display("TEST ADDRESS ACCESS: addr=%d, write=%b, data=%h", 
+               mem_addr_o[13:2], mem_write_o, (mem_write_o ? mem_wdata_o : mem_rdata_o));
+    end
+  end
+end
 endmodule
 
 //Writeback pipeline stage
@@ -1369,8 +1380,7 @@ module Decoder(
   //ALU control signals
   output  reg [1:0]   a_sel_o, //Reg or PC
   output  reg [1:0]   b_sel_o, //Reg or Imm or PC 
-  output  reg [4:0]   alu_op_sel_o,
-
+ 
   //Status register control signals
   output  reg         sreg_we_o,
   //PC control signals
@@ -1382,8 +1392,6 @@ module Decoder(
   output  reg         dmem_wr_en_o,
   output  reg [1:0]   dmem_be_o,
   output  reg         dmem_signed_o
-
-
 
 );
   always @(*) begin
