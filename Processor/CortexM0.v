@@ -1,4 +1,3 @@
-
 `define   ALU_AND  5'b00000
 `define   ALU_EOR  5'b00001
 `define   ALU_LSL  5'b00010
@@ -26,9 +25,6 @@
 `define   ALU_SUB   5'b11000
 `define   ALU_UXTH  5'b11001 
 `define   ALU_UXTB  5'b11010
-
-
-
 
 `define   ALU_A_SEL_REG  2'b00
 `define   ALU_A_SEL_PC  2'b01
@@ -939,7 +935,7 @@ module ExecuteStage(
 
   //Forwarding multiplexers
   always @(*) begin
-
+    // First set the values based on forwarding logic
     case(fwd_mux_a_i)
       `FWD_MUX_REG : fwd_mux_a_data = reg_a_data_i;
       `FWD_MUX_EXE_MEM : fwd_mux_a_data = fwd_exe_mem_data_i;
@@ -1185,17 +1181,20 @@ always @(posedge clk_i or negedge reset_i) begin
     V_o <= V_w;
   end
 end
+
 //============Memory access debug
 always @(posedge clk_i) begin
-  if (mem_cs_o == 1'b1) begin
-    $display("Memory access at time %0t: addr=0x%h, write=%b, data=%h", 
-             $time, mem_addr_o, mem_write_o, (mem_write_o ? mem_wdata_o : mem_rdata_o));
-    
-    if (mem_addr_o[13:2] >= 132 && mem_addr_o[13:2] <= 145) begin
-      $display("TEST ADDRESS ACCESS: addr=%d, write=%b, data=%h", 
-               mem_addr_o[13:2], mem_write_o, (mem_write_o ? mem_wdata_o : mem_rdata_o));
-    end
-  end
+  // if (mem_cs_o == 1'b1) begin
+  //   $display("Memory access: addr=0x%h, word_addr=%d, write=%b, data=%h", 
+  //           mem_addr_o, mem_addr_o[13:2], mem_write_o, 
+  //           (mem_write_o ? mem_wdata_o : mem_rdata_o));
+            
+  //   // Check for the specific addresses from the dump
+  //   if (mem_addr_o >= 32'h00000210 && mem_addr_o <= 32'h00000244) begin
+  //     $display("TEST ADDRESS ACCESS: addr=0x%h, write=%b, data=%h", 
+  //             mem_addr_o, mem_write_o, (mem_write_o ? mem_wdata_o : mem_rdata_o));
+  //   end
+  // end
 end
 endmodule
 
@@ -1380,7 +1379,8 @@ module Decoder(
   //ALU control signals
   output  reg [1:0]   a_sel_o, //Reg or PC
   output  reg [1:0]   b_sel_o, //Reg or Imm or PC 
- 
+  output  reg [4:0]   alu_op_sel_o, // Add this line
+
   //Status register control signals
   output  reg         sreg_we_o,
   //PC control signals
@@ -2525,7 +2525,8 @@ always @(*) begin
         {carry_o, result_o} = a_i << b_i;
         overflow_o = overflow_i;
         negative_o = result_o[31];
-        zero_o = ~|result_o;    
+        zero_o = ~|result_o;
+
       end
 
       `ALU_LSR : begin
@@ -2585,7 +2586,7 @@ always @(*) begin
         {carry_o, result_o} = a_i + ~b_i + 1; //carry 
         overflow_o = a_i[31] ^ b_i[31] ^ result_o[31] ^ carry_o;
         negative_o = result_o[31];
-        zero_o = ~|result_o;            
+        zero_o = ~|result_o;         
       end
 
       `ALU_CMN : begin
@@ -2624,16 +2625,16 @@ always @(*) begin
         carry_o = carry_i;
         overflow_o = overflow_i;
         negative_o = result_o[31];
-        zero_o = ~|result_o;           
+        zero_o = ~|result_o;  
       end
       `ALU_ADD : begin
         {carry_o, result_o} = a_i + b_i;
         overflow_o = a_i[31] ^ b_i[31] ^ result_o[31] ^ carry_o;
         negative_o = result_o[31];
         zero_o = ~|result_o;    
-      // Debug
-      $display("  ADD: result=%h, carry=%b, ovf=%b, neg=%b, zero=%b", 
-               result_o, carry_o, overflow_o, negative_o, zero_o);
+        // Debug
+        $display("  ADD: a=%h, b=%h, result=%h, c=%b", 
+                    a_i, b_i, result_o, carry_o);
     
       end
 
@@ -2642,8 +2643,9 @@ always @(*) begin
         overflow_o = a_i[31] ^ b_i[31] ^ result_o[31] ^ carry_o;
         negative_o = result_o[31];
         zero_o = ~|result_o;            
-      // Debug
-      $display("  SUB: a=%h, b=%h, ~b=%h, result=%h, c=%b", a_i, b_i, ~b_i, result_o, carry_o);
+        // Debug
+        $display("  SUB: a=%h, b=%h, ~b=%h, result=%h, c=%b", 
+        a_i, b_i, ~b_i, result_o, carry_o);
       end
 
       `ALU_MOVA : begin
@@ -2651,7 +2653,8 @@ always @(*) begin
         carry_o = carry_i;
         overflow_o = overflow_i;
         negative_o = result_o[31];
-        zero_o = ~|result_o;      
+        zero_o = ~|result_o;
+
       end
 
       `ALU_MOVB : begin
@@ -2660,6 +2663,7 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;      
+
       end
 
       `ALU_SXTH : begin
@@ -2668,6 +2672,7 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;      
+
       end
 
       `ALU_SXTB : begin
@@ -2676,6 +2681,7 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;      
+
       end
 
       `ALU_UXTH : begin
@@ -2684,6 +2690,7 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;    
+
       end
 
       `ALU_UXTB : begin
@@ -2692,6 +2699,7 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;      
+
       end
 
       `ALU_REV : begin
@@ -2700,6 +2708,7 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;      
+
       end
 
       `ALU_REV16 : begin
@@ -2708,6 +2717,8 @@ always @(*) begin
         overflow_o = overflow_i;
         negative_o = result_o[31];
         zero_o = ~|result_o;      
+
+
       end
 
       `ALU_REVSH : begin

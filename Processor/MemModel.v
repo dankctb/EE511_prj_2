@@ -38,9 +38,10 @@ module SRAM (
 	assign DO2 = outline2;
 
 	always @ (posedge CLK) begin
+	
 	// writememh can be ignored 
 	// keep writing to the ALU_TEST_data.hex file from ram
-    $writememh(MEMDATA, ram);
+	$writememh(MEMDATA, ram);
 
 		if (~CSN1) begin		// chip select at negative
 			if (~WE1) begin		// read operation
@@ -74,7 +75,7 @@ module SRAM (
 				if (BE2[2]) tmp_wd2[23:16] = DI2[23:16];
 				if (BE2[3]) tmp_wd2[31:24] = DI2[31:24];
 
-				ram[ADDR2] = tmp_wd2;
+				ram[ADDR2] = tmp_wd2; //ALU results lie here
 			end
 		end
 	end
